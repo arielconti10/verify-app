@@ -58,10 +58,19 @@ Other tools and mobile capture need a declared procedure with validation checks.
 See [browser evidence](references/browser-evidence.md) for commands and limits.
 File validation checks media settings and integrity. It does not prove application correctness, sharpness, or smooth motion.
 
+## Publish evidence with GitHub CLI
+
+The optional [publishing guide](references/publish-evidence.md) covers `gh --attach` in version 2.99 and later.
+It explains upload access, Markdown URL replacement, video placement, and recovery after partial failures.
+
+The local formatter prepares Before/After tables, previews, and standalone videos from freshly validated captures.
+It replaces one marked evidence section while preserving unrelated PR text. It does not publish anything itself.
+PR evidence goes in the description; comments are not used as upload storage.
+
 ## Tests
 
 ```sh
-python3 scripts/test_evidence.py
+python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
 Media tests require FFmpeg and ffprobe. The suite reports skipped media tests if those tools are absent.
@@ -69,9 +78,9 @@ Media tests require FFmpeg and ffprobe. The suite reports skipped media tests if
 For helper coverage, install Coverage.py in a separate tool environment, then run:
 
 ```sh
-python3 -m coverage run --branch --source=scripts scripts/test_evidence.py
-python3 -m coverage report --include='*/evidence.py'
-python3 -m coverage xml --include='*/evidence.py' -o coverage/coverage.xml
+python3 -m coverage run --branch --source=scripts -m unittest discover -s scripts -p 'test_*.py'
+python3 -m coverage report --include='*/evidence.py,*/format_evidence.py'
+python3 -m coverage xml --include='*/evidence.py,*/format_evidence.py' -o coverage/coverage.xml
 ```
 
 Coverage reports are local evaluation files. They are not part of the skill bundle.

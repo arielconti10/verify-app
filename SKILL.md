@@ -90,6 +90,8 @@ File validation does not establish visual quality or application correctness. Fo
 
 ## Share and report
 
+For comparison layouts or authorized PR publication, read [publish evidence](references/publish-evidence.md).
+
 Report passed checks, failed checks, and checks not run separately. Give a reason for each material gap.
 Describe the user action and observed result. Link the relevant evidence.
 Do not infer deployment, merge status, or complete product correctness from a local check.
