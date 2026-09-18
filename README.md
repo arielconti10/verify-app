@@ -26,11 +26,13 @@ Example requests:
 
 The procedure uses the project's existing tools and commands. It does not require a particular editor or package manager.
 
-## Optional browser capture helper
+## Browser capture and validation
 
 The bundled helper requires macOS or Linux, Python 3, agent-browser 0.38.1 or later, FFmpeg, and ffprobe.
 It uses a fixed desktop profile: 1440 × 900 viewport, scale 2, and 2880 × 1800 output.
-Video uses H.264 at 60 fps. Other browser tools and mobile capture can use the main procedure without this helper.
+Video uses H.264 at 60 fps. Supported agent-browser desktop checks must use this helper, including screenshot-only checks.
+Run its validator immediately before sharing and use only returned files.
+Other tools and mobile capture need a declared procedure with validation checks. Missing validation remains incomplete.
 
 See [browser evidence](references/browser-evidence.md) for commands and limits.
 File validation checks media settings and integrity. It does not prove application correctness, sharpness, or smooth motion.

@@ -71,11 +71,18 @@ Capture the action and result. A final screenshot alone does not prove the prece
 Use screenshots for visual details. Use video when motion or a sequence matters, or when the task requires it.
 Do not require browser video for a library, backend, or documentation change without a relevant visual claim.
 
-For agent-browser desktop capture, read [browser evidence](references/browser-evidence.md).
-It includes a managed capture helper and file validation. It requires Python 3, agent-browser, FFmpeg, and ffprobe.
-The helper supports macOS and Linux. Other browser tools can follow the same evidence principles without this helper.
+For supported agent-browser desktop capture, use the bundled managed commands for screenshots and videos.
+Read [browser evidence](references/browser-evidence.md) before opening the capture session.
+Direct screenshots and recordings do not satisfy this capture requirement, including screenshot-only checks.
+The helper requires macOS or Linux, Python 3, agent-browser, FFmpeg, and ffprobe.
+Run its `check` command immediately before sharing or uploading evidence. Require exit code zero.
+Use only the files returned by that fresh check. A saved pass report is not sufficient.
+
+For other tools, mobile, or unsupported formats, setup must define a capture procedure and its validation checks.
+Record the reason for that alternative and follow [alternative capture requirements](references/browser-evidence.md#alternative-capture).
+If required validation is unavailable, report evidence validation as incomplete. Do not label those files as accepted evidence.
+Keep completed application checks separate from incomplete evidence validation. Do not omit required application coverage to fit the helper.
 Use [natural recording](references/natural-recording.md) for pointer movement, typing, and visual review when recording video.
-Mobile, full-page, and other capture formats need a suitable tool and declared settings. Do not omit required coverage to fit the helper.
 
 Keep original media. Exclude secrets and unrelated private data before capture.
 Check actual dimensions and decoding. Review small text, thin icons, and later video frames at their intended display size.

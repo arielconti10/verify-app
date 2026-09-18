@@ -3,15 +3,37 @@
 ## Choose the capture path
 
 Use the browser tool available in the current environment. Check its installed documentation before driving the page.
-The bundled helper uses agent-browser 0.38.1 or later and a fixed desktop profile.
+Use the bundled helper for supported agent-browser desktop captures, including screenshots without video.
+It uses agent-browser 0.38.1 or later and a fixed desktop profile.
 It needs Python 3, FFmpeg, and ffprobe on PATH. Its file lock requires macOS or Linux.
 When using the helper, run `agent-browser doctor` before video capture. Do not modify the installed browser package.
 
 This profile uses a 1440 × 900 viewport, native scale 2, and device pixel ratio 2.
 PNG and MP4 dimensions are 2880 × 1800. Video uses H.264, yuv420p, and 60 fps, without audio.
 These are helper settings, not universal application requirements.
-For mobile, another viewport, full-page capture, or another browser tool, use a separate capture path and report its settings.
+For unsupported environments or formats, follow the alternative capture requirements below.
+Do not select an alternative merely to skip managed capture or its checks.
 Do not resize managed media or edit its record to pass validation.
+
+## Alternative capture
+
+Use an alternative when the bundled desktop profile cannot serve the required tool, environment, or capture format.
+Before capture, record the reason, selected tool, target application, session, capture settings, and validation procedure.
+The procedure must check:
+
+- The intended application and account, with a separate task-owned session where supported.
+- Declared viewport or device settings, output dimensions, and completed image loading.
+- Original files, complete capture, successful decoding, and the actual media format.
+- For video, duration, frame rate, and frame dimensions throughout the recording.
+- File hashes after capture, with a fresh integrity check immediately before sharing.
+- An explicit list of accepted files. Missing, changed, or failed files cannot pass.
+
+Use available tool metadata, commands, and file inspection. Do not fabricate measurements unavailable from the tool.
+For full-page images, declare expected dimensions from the page extent instead of the viewport.
+Keep visual review separate. File checks cannot prove readability, smooth motion, or correct application behavior.
+If a required check cannot run, mark evidence validation incomplete and name the missing check.
+Unvalidated files may remain as diagnostic material. Do not present them as accepted verification evidence.
+Missing dependencies do not justify a silent fallback. Use an authorized installation or report the missing capture capability.
 
 ## Initialize
 
@@ -62,7 +84,7 @@ Recordings must last more than zero seconds and no more than five minutes.
 Snapshots and logs may accompany evidence. Keep extracted frames and alternate captures outside the managed directory.
 
 Review screenshots and video separately. A sharp screenshot does not prove sharp video.
-Compare a direct screenshot with a later stable video frame showing the same state.
+Compare a validated screenshot with a later stable video frame showing the same state.
 A 60 fps file can contain repeated frames. Static holds are normal; judge cadence during actual movement.
 Check full playback, transitions, scrolling, pointer movement, and the final result at normal speed.
 If available, record playback completion, errors, and `getVideoPlaybackQuality()` frame counts.

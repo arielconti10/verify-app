@@ -35,7 +35,12 @@ For a read-only task, provide the procedure in the task report and continue perm
 
 Keep references relative to the procedure. Do not depend on the author's home directory or global skill installation.
 When copying helper files, include their required references and show the exact invocation.
-If a helper is optional, describe the supported alternative and its evidence limits.
+Preserve the managed capture requirement for supported agent-browser desktop evidence, including screenshot-only checks.
+Copy the helper and its references when the procedure must work without this skill installed.
+Document the exact initialization, capture, validation, and cleanup commands. Use the project's command runner or direct Python commands.
+Do not require a particular package manager. Preserve existing validation commands when they provide the required checks.
+For unsupported capture paths, define checks using [alternative capture requirements](browser-evidence.md#alternative-capture).
+Missing validation means incomplete evidence validation; setup must not make it optional.
 
 ## Write executable steps
 
@@ -75,7 +80,8 @@ Link the map from the procedure. Keep shared startup and capture instructions in
 ## Test the setup
 
 Run the written procedure on one representative feature within the authorized task scope.
-Check startup, health, the user action, its result, evidence capture, and cleanup.
+Check startup, health, the user action, its result, evidence capture, validation, and cleanup.
+For managed evidence, run the helper's `check` command and require exit code zero before accepting the files.
 Confirm that evidence remains after cleanup. Record which feature passed and which mapped features remain untested.
 Do not repeat consequential actions only to test the procedure.
 If startup fails, inspect the actual error. Repair only faults within scope, then repeat the affected check.
