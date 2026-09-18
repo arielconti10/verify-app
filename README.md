@@ -26,6 +26,54 @@ Example requests:
 
 The procedure uses the project's existing tools and commands. It does not require a particular editor or package manager.
 
+## Example output
+
+This fictional example shows a report for a saved notification setting. Paths and results are illustrative.
+The agent selects checks from the user's request and the actual codebase.
+
+```text
+Result: PARTIAL — saving works, but the error message check failed.
+
+Context
+- Checkout: feature/notification-settings at abc1234.
+- Application: http://localhost:3000/settings/notifications.
+- Account: local test account. Initial setting: email notifications off.
+- Scope: save the setting and check a rejected save. Do not send email.
+
+Passed
+- Enabled email notifications and selected Save. The page showed “Saved”.
+- Reloaded the page. Email notifications remained enabled.
+
+Failed
+- Rejected a save through a declared browser request mock.
+- Expected: an error message and no success confirmation.
+- Observed: no error message. The page continued to show “Saving”.
+- This check covers the interface response, not a real server failure.
+
+Not run
+- Email delivery: excluded from the requested scope.
+- Mobile layout: no mobile check was requested.
+
+Evidence
+- Directory: /tmp/verify-notifications-example/.
+- Actions and results: actions.txt.
+- Managed screenshots: before.png, after-reload.png, failed-save.png.
+- Fresh evidence check: exit code 0; all three screenshots accepted.
+- Visual review: labels and controls readable at the intended display size.
+- Video: not recorded; this check makes no motion claim.
+
+Cleanup
+- Restored the initial setting and confirmed it after reload.
+- Removed the request mock. Closed the test browser and owned server.
+- Retained the report and evidence files.
+
+Limit
+- These results cover the listed local checks. They do not prove deployment
+  status, email delivery, or complete application correctness.
+```
+
+A real report links its saved evidence. Accepted media confirms file validation; it does not turn a failed application check into a pass.
+
 ## Browser capture and validation
 
 The bundled helper requires macOS or Linux, Python 3, agent-browser 0.38.1 or later, FFmpeg, and ffprobe.
