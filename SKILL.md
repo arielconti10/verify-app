@@ -19,12 +19,10 @@ Setup does not authorize external writes or actions outside the requested task.
 
 ## Find the verification path
 
-Read repository instructions, startup scripts, relevant tests, and the changed entry points.
-Determine the runtime version, startup command, readiness check, application address, sign-in method, and test data.
-Confirm the checkout and existing processes before starting another instance.
-Use the repository's address discovery command when one exists. Do not guess a branch URL or port.
-Check which services and data stores are shared. Do not assume a worktree isolates the database.
-Ask only for information that cannot be found and blocks the requested check.
+Use the project procedure to establish runtime, startup, readiness, address, sign-in, and test data.
+Confirm the checkout and existing processes. Resolve addresses from running output or the project's discovery command.
+Check shared services and data stores; a worktree does not isolate them.
+Ask only for unavailable information that blocks the requested check.
 
 Choose the interface the user actually uses:
 
@@ -37,7 +35,6 @@ Choose the interface the user actually uses:
 | Library | Exercise the public API with realistic inputs and inspect its outputs. |
 
 Use relevant automated tests as additional evidence. A passing test does not prove an untested user path.
-Use the setup procedure and feature map to select the required checks.
 Install missing tools only when necessary and within the task scope.
 
 ## Prepare and check
@@ -78,20 +75,18 @@ Do not require browser video for a library, backend, or documentation change wit
 For supported agent-browser desktop capture, use the bundled managed commands for screenshots and videos.
 Read [browser evidence](references/browser-evidence.md) before opening the capture session.
 Direct screenshots and recordings do not satisfy this capture requirement, including screenshot-only checks.
-The helper requires macOS or Linux, Python 3, agent-browser, FFmpeg, and ffprobe.
-Run its `check` command immediately before sharing or uploading evidence. Require exit code zero.
-Use only the files returned by that fresh check. A saved pass report is not sufficient.
+Run the helper's `check` immediately before sharing. Require exit code zero and use only returned files.
+A saved pass report is insufficient.
 
 For other tools, mobile, or unsupported formats, setup must define a capture procedure and its validation checks.
 Record the reason for that alternative and follow [alternative capture requirements](references/browser-evidence.md#alternative-capture).
 If required validation is unavailable, report evidence validation as incomplete. Do not label those files as accepted evidence.
 Keep completed application checks separate from incomplete evidence validation. Do not omit required application coverage to fit the helper.
-Use [natural recording](references/natural-recording.md) for pointer movement, typing, and visual review when recording video.
+Read [natural recording](references/natural-recording.md) only for video interaction and review.
+Execute the helper from the documented commands. Read its source or tests only for diagnosis or changes.
 
 Keep original media. Exclude secrets and unrelated private data before capture.
-Check actual dimensions and decoding. Review small text, thin icons, and later video frames at their intended display size.
-Review the complete video at normal speed when possible. Report unavailable playback review.
-File validation does not prove sharpness, smooth motion, or application correctness.
+File validation does not establish visual quality or application correctness. Follow the reference's visual review steps.
 
 ## Share and report
 
