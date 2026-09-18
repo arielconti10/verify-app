@@ -3,3 +3,8 @@ __pycache__/
 .plugin-eval/
 output/
 .DS_Store
+
+.coverage
+coverage.xml
+htmlcov/
+coverage/

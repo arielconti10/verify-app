@@ -20,6 +20,11 @@ Find these facts in repository instructions, startup scripts, routes, tests, and
 Ask only for missing facts that prevent the requested verification.
 Check existing tool support before choosing new dependencies. Prefer the project's working verification tools.
 Resolve the current address from the running instance or project command. Do not invent ports or branch URLs.
+Check startup scripts, command wrappers, and tool configuration for automatic installation, migrations, and durable worker activity.
+Prefer the real checkout and documented startup mode. Record any necessary deviation and its verification limits.
+If isolation is needed, identify writable dependency directories, caches, and data stores. Symbolic links can share writes.
+When installation is prohibited, use a verified startup path that cannot install dependencies, or report the blocker.
+If unexpected installation begins, stop the owned process and report what is known. Do not infer unchanged dependencies from Git status.
 Check automatic saves and other side effects before using shared data.
 Keep credentials in the approved local store. Record how to obtain access, not secret values.
 

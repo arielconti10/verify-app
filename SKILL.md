@@ -43,7 +43,11 @@ Install missing tools only when necessary and within the task scope.
 ## Prepare and check
 
 Use the documented runtime and dependency versions. Reuse a healthy instance only when it serves the intended checkout.
-Start required services with the repository's commands. Keep their process identifiers or terminal session identifiers.
+Use the actual checkout and its normal startup command unless the task requires isolation.
+Inspect startup scripts and command wrappers for automatic installs, migrations, and worker startup before running them.
+Respect installation limits. A startup command does not exempt an automatic installation from those limits.
+Do not treat copied source with linked writable dependencies as isolated.
+Keep process identifiers or terminal session identifiers for services you start.
 Run the available health check. Check the application address, build, required services, and sign-in state.
 If startup fails, inspect the failing check and logs. Fix issues within scope or report the exact blocker.
 Use a separate browser or terminal session when possible. Do not take control of another task's session.

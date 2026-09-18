@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Fixed desktop capture and independent local validation. No package patches."""
+
 import argparse
 import fcntl
 import hashlib
@@ -13,8 +14,15 @@ import tempfile
 import uuid
 from urllib.parse import urlsplit
 
-PROFILE = {"name": "desktop-v1", "width": 1440, "height": 900, "dpr": 2,
-           "scale": 1, "pixels": [2880, 1800], "fps": 60}
+PROFILE = {
+    "name": "desktop-v1",
+    "width": 1440,
+    "height": 900,
+    "dpr": 2,
+    "scale": 1,
+    "pixels": [2880, 1800],
+    "fps": 60,
+}
 MEDIA = {".png", ".mp4", ".jpg", ".jpeg", ".webm", ".gif", ".mov", ".avif", ".webp"}
 
 
@@ -25,7 +33,10 @@ def require(condition, message):
 
 def run(args, env=None, timeout=60):
     result = subprocess.run(args, capture_output=True, text=True, env=env, timeout=timeout)
-    require(result.returncode == 0, f"{args[0]} failed: {result.stderr[-1500:] or result.stdout[-1500:]}")
+    require(
+        result.returncode == 0,
+        f"{args[0]} failed: {result.stderr[-1500:] or result.stdout[-1500:]}",
+    )
     return result.stdout.strip()
 
 
@@ -46,9 +57,16 @@ def save(folder, record):
 def load(folder):
     record = json.loads((folder / "capture.json").read_text())
     require(isinstance(record, dict), "Capture record must be an object")
-    require("active" in record and isinstance(record.get("assets"), list), "Incomplete capture record")
-    require(record.get("schema") == 1 and record.get("profile") == PROFILE, "Unknown or changed capture policy")
-    require(re.fullmatch(r"evidence-[a-f0-9]{32}", record.get("session", "")), "Invalid capture session")
+    require(
+        "active" in record and isinstance(record.get("assets"), list), "Incomplete capture record"
+    )
+    require(
+        record.get("schema") == 1 and record.get("profile") == PROFILE,
+        "Unknown or changed capture policy",
+    )
+    require(
+        re.fullmatch(r"evidence-[a-f0-9]{32}", record.get("session", "")), "Invalid capture session"
+    )
     return record
 
 
@@ -58,8 +76,22 @@ def browser(record, *args):
     with tempfile.TemporaryDirectory(prefix="evidence-config-") as directory:
         config = Path(directory) / "config.json"
         config.write_text("{}")
-        value = json.loads(run(["agent-browser", "--config", str(config), "--session", record["session"],
-                               "--args", "--force-device-scale-factor=2", "--json", *args], env=env))
+        value = json.loads(
+            run(
+                [
+                    "agent-browser",
+                    "--config",
+                    str(config),
+                    "--session",
+                    record["session"],
+                    "--args",
+                    "--force-device-scale-factor=2",
+                    "--json",
+                    *args,
+                ],
+                env=env,
+            )
+        )
     require(value.get("success") is True, "Browser command failed")
     return value.get("data")
 
@@ -74,89 +106,177 @@ def check_metrics(metrics, origin):
 
 
 def measure(record):
-    data = browser(record, "eval", """document.fonts.ready.then(() => ({
+    data = browser(
+        record,
+        "eval",
+        """document.fonts.ready.then(() => ({
       width:innerWidth,height:innerHeight,dpr:devicePixelRatio,scale:visualViewport.scale,
       origin:location.origin,fonts:document.fonts.status,
       imagesReady:[...document.images].filter(i=>{const r=i.getBoundingClientRect();
         return r.width>0&&r.height>0&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth})
         .every(i=>i.complete&&i.naturalWidth>0)
-    }))""")
+    }))""",
+    )
     metrics = data["result"]
     check_metrics(metrics, record["origin"])
     return metrics
 
 
 def asset_path(folder, name):
-    require(isinstance(name, str) and re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]*\.(png|mp4)", name),
-            "Use a plain PNG or MP4 filename with letters, numbers, hyphens, or underscores")
+    require(
+        isinstance(name, str) and re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]*\.(png|mp4)", name),
+        "Use a plain PNG or MP4 filename with letters, numbers, hyphens, or underscores",
+    )
     path = folder / name
     require(not path.is_symlink(), "Symbolic links are not evidence files")
     return path
 
 
 def inspect(path, kind):
-    info = json.loads(run(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(path)]))
+    info = json.loads(
+        run(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(path)])
+    )
     streams = info.get("streams", [])
-    require(len(streams) == 1 and streams[0].get("codec_type") == "video", "Require one video/image stream without audio")
+    require(
+        len(streams) == 1 and streams[0].get("codec_type") == "video",
+        "Require one video/image stream without audio",
+    )
     stream = streams[0]
-    require([stream.get("width"), stream.get("height")] == PROFILE["pixels"], "Wrong image dimensions: require 2880 x 1800")
-    require(stream.get("codec_name") == ("png" if kind == "screenshot" else "h264"), "Wrong evidence codec")
+    require(
+        [stream.get("width"), stream.get("height")] == PROFILE["pixels"],
+        "Wrong image dimensions: require 2880 x 1800",
+    )
+    require(
+        stream.get("codec_name") == ("png" if kind == "screenshot" else "h264"),
+        "Wrong evidence codec",
+    )
     if kind == "screenshot":
         with path.open("rb") as source:
             require(source.read(8) == b"\x89PNG\r\n\x1a\n", "Screenshot is not a PNG")
     else:
-        require("mp4" in info.get("format", {}).get("format_name", "").split(","), "Video is not MP4")
+        require(
+            "mp4" in info.get("format", {}).get("format_name", "").split(","), "Video is not MP4"
+        )
         require(stream.get("pix_fmt") == "yuv420p", "Video must use yuv420p")
-        require(stream.get("r_frame_rate") == "60/1" and stream.get("avg_frame_rate") == "60/1", "Video must be 60 fps")
+        require(
+            stream.get("r_frame_rate") == "60/1" and stream.get("avg_frame_rate") == "60/1",
+            "Video must be 60 fps",
+        )
         duration = float(info["format"]["duration"])
-        require(0 < duration <= 301, "Video duration must be greater than zero and at most five minutes")
-        frames = json.loads(run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_frames",
-                                "-show_entries", "frame=width,height", "-of", "json", str(path)], timeout=180))["frames"]
+        require(
+            0 < duration <= 301, "Video duration must be greater than zero and at most five minutes"
+        )
+        frames = json.loads(
+            run(
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-select_streams",
+                    "v:0",
+                    "-show_frames",
+                    "-show_entries",
+                    "frame=width,height",
+                    "-of",
+                    "json",
+                    str(path),
+                ],
+                timeout=180,
+            )
+        )["frames"]
         require(bool(frames), "Video contains no decoded frames")
-        require(all([f.get("width"), f.get("height")] == PROFILE["pixels"] for f in frames), "Video frame dimensions changed")
-    run(["ffmpeg", "-nostdin", "-v", "error", "-xerror", "-i", str(path), "-f", "null", "-"], timeout=180)
-    return {"codec": stream["codec_name"], "width": stream["width"], "height": stream["height"],
-            "fps": stream.get("avg_frame_rate"), "duration": info.get("format", {}).get("duration")}
+        require(
+            all([f.get("width"), f.get("height")] == PROFILE["pixels"] for f in frames),
+            "Video frame dimensions changed",
+        )
+    run(
+        ["ffmpeg", "-nostdin", "-v", "error", "-xerror", "-i", str(path), "-f", "null", "-"],
+        timeout=180,
+    )
+    return {
+        "codec": stream["codec_name"],
+        "width": stream["width"],
+        "height": stream["height"],
+        "fps": stream.get("avg_frame_rate"),
+        "duration": info.get("format", {}).get("duration"),
+    }
 
 
 def validate(folder):
     record = load(folder)
     require(record.get("active") is None, "Recording or capture remains incomplete")
     require(record.get("assets"), "No evidence files were captured")
-    require(application_origin(record.get("origin", "")) == record["origin"], "Invalid application origin")
-    require(record.get("launchArgs") == ["--force-device-scale-factor=2"], "Wrong browser launch settings")
-    require(re.fullmatch(r"agent-browser \d+\.\d+\.\d+", record.get("toolVersion", "")), "Missing tool version")
-    require(tuple(map(int, record["toolVersion"].split()[1].split("."))) >= (0, 38, 1), "Require agent-browser 0.38.1 or later")
+    require(
+        application_origin(record.get("origin", "")) == record["origin"],
+        "Invalid application origin",
+    )
+    require(
+        record.get("launchArgs") == ["--force-device-scale-factor=2"],
+        "Wrong browser launch settings",
+    )
+    require(
+        re.fullmatch(r"agent-browser \d+\.\d+\.\d+", record.get("toolVersion", "")),
+        "Missing tool version",
+    )
+    require(
+        tuple(map(int, record["toolVersion"].split()[1].split("."))) >= (0, 38, 1),
+        "Require agent-browser 0.38.1 or later",
+    )
     names = []
     results = []
     for item in record["assets"]:
         path = asset_path(folder, item["path"])
         require(item.get("kind") in ("screenshot", "video"), "Unknown evidence kind")
-        require(path.suffix == (".png" if item["kind"] == "screenshot" else ".mp4"), "Wrong evidence extension")
+        require(
+            path.suffix == (".png" if item["kind"] == "screenshot" else ".mp4"),
+            "Wrong evidence extension",
+        )
         require(path.name not in names, "Duplicate evidence entry")
         names.append(path.name)
         for field in ("before", "after"):
             check_metrics(item.get(field), record["origin"])
-        require(path.is_file() and digest(path) == item.get("sha256"), f"Missing or changed evidence: {path.name}")
+        require(
+            path.is_file() and digest(path) == item.get("sha256"),
+            f"Missing or changed evidence: {path.name}",
+        )
         if item["kind"] == "video":
-            require(item.get("recordArgs") == ["--fps", "60", "--cursor"], "Wrong recording settings")
+            require(
+                item.get("recordArgs") == ["--fps", "60", "--cursor"], "Wrong recording settings"
+            )
         results.append({"path": path.name, **inspect(path, item["kind"])})
     actual = {str(p.relative_to(folder)) for p in folder.rglob("*") if p.suffix.lower() in MEDIA}
     require(actual == set(names), "Unregistered evidence files exist in the proof directory")
-    return {"status": "pass", "scope": "capture-settings-and-file-integrity", "assets": results,
-            "limits": ["Local records are not signed attestations.", "Sharpness, pointer visibility, natural input, and feature correctness require review.",
-                       "Nominal fps does not prove distinct source frames or smooth playback."]}
+    return {
+        "status": "pass",
+        "scope": "capture-settings-and-file-integrity",
+        "assets": results,
+        "limits": [
+            "Local records are not signed attestations.",
+            "Sharpness, pointer visibility, natural input, and feature correctness require review.",
+            "Nominal fps does not prove distinct source frames or smooth playback.",
+        ],
+    }
 
 
 def application_origin(url):
     parsed = urlsplit(url)
-    require(parsed.scheme in ("http", "https") and bool(parsed.hostname), "Require an HTTP or HTTPS application URL")
-    require(parsed.username is None and parsed.password is None, "Do not include credentials in the application URL")
+    require(
+        parsed.scheme in ("http", "https") and bool(parsed.hostname),
+        "Require an HTTP or HTTPS application URL",
+    )
+    require(
+        parsed.username is None and parsed.password is None,
+        "Do not include credentials in the application URL",
+    )
     port = parsed.port
     host = parsed.hostname.lower()
     if ":" in host:
         host = "[" + host + "]"
-    suffix = "" if port is None or (parsed.scheme, port) in (("http", 80), ("https", 443)) else f":{port}"
+    suffix = (
+        ""
+        if port is None or (parsed.scheme, port) in (("http", 80), ("https", 443))
+        else f":{port}"
+    )
     return f"{parsed.scheme}://{host}{suffix}"
 
 
@@ -164,11 +284,24 @@ def initialize(folder, url, state):
     require(not folder.exists(), "Use a new proof directory")
     origin = application_origin(url)
     version = run(["agent-browser", "--version"])
-    require(re.fullmatch(r"agent-browser \d+\.\d+\.\d+", version), "Cannot identify agent-browser version")
-    require(tuple(map(int, version.split()[1].split("."))) >= (0, 38, 1), "Require agent-browser 0.38.1 or later")
-    record = {"schema": 1, "profile": PROFILE, "session": "evidence-" + uuid.uuid4().hex,
-              "origin": origin, "toolVersion": version, "launchArgs": ["--force-device-scale-factor=2"],
-              "assets": [], "active": {"kind": "initializing"}}
+    require(
+        re.fullmatch(r"agent-browser \d+\.\d+\.\d+", version),
+        "Cannot identify agent-browser version",
+    )
+    require(
+        tuple(map(int, version.split()[1].split("."))) >= (0, 38, 1),
+        "Require agent-browser 0.38.1 or later",
+    )
+    record = {
+        "schema": 1,
+        "profile": PROFILE,
+        "session": "evidence-" + uuid.uuid4().hex,
+        "origin": origin,
+        "toolVersion": version,
+        "launchArgs": ["--force-device-scale-factor=2"],
+        "assets": [],
+        "active": {"kind": "initializing"},
+    }
     folder.mkdir(parents=True)
     save(folder, record)
     try:
@@ -209,7 +342,9 @@ def capture(folder, command, name):
         record["active"] = item
         save(folder, record)
         if kind == "video":
-            browser(record, "--input-mode", "human", "record", "start", str(path), *item["recordArgs"])
+            browser(
+                record, "--input-mode", "human", "record", "start", str(path), *item["recordArgs"]
+            )
             return {"status": "recording", "session": record["session"]}
         browser(record, "screenshot", "--screenshot-format", "png", str(path))
     item["after"] = measure(record)

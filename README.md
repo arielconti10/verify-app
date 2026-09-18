@@ -44,3 +44,13 @@ python3 scripts/test_evidence.py
 ```
 
 Media tests require FFmpeg and ffprobe. The suite reports skipped media tests if those tools are absent.
+
+For helper coverage, install Coverage.py in a separate tool environment, then run:
+
+```sh
+python3 -m coverage run --branch --source=scripts scripts/test_evidence.py
+python3 -m coverage report --include='*/evidence.py'
+python3 -m coverage xml --include='*/evidence.py' -o coverage/coverage.xml
+```
+
+Coverage reports are local evaluation files. They are not part of the skill bundle.
