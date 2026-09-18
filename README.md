@@ -11,6 +11,7 @@ A reusable skill for coding agents that verify application behavior through real
 - Preserves evidence when test sessions and processes stop.
 
 Start with [SKILL.md](SKILL.md). Project setup instructions are in [references/project-setup.md](references/project-setup.md).
+See [the product spec](SPEC.md) for scope, current capabilities, verification limits, and proposed work.
 
 ## Example output
 
