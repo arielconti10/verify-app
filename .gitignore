@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.plugin-eval/
+output/
+.DS_Store
