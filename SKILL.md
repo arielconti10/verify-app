@@ -83,7 +83,7 @@ Record the reason for that alternative and follow [alternative capture requireme
 If required validation is unavailable, report evidence validation as incomplete. Do not label those files as accepted evidence.
 Keep completed application checks separate from incomplete evidence validation. Do not omit required application coverage to fit the helper.
 Read [natural recording](references/natural-recording.md) only for video interaction and review.
-For a demo video, make a shorter copy with `scripts/demo_cut.py` and keep it outside the managed capture directory. The demo is not evidence: never present it as a checked asset.
+For a demo video, stop the recorder while choosing the next action and record each gesture as its own take. Join the takes with `scripts/demo_join.py` outside the managed capture directory. Do not freeze-cut the evidence file: a pointer move changes too few pixels and the cut removes it. The demo is not evidence: never present it as a checked asset.
 Execute the helper from the documented commands. Read its source or tests only for diagnosis or changes.
 
 Keep original media. Exclude secrets and unrelated private data before capture.
