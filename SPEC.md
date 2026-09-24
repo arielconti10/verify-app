@@ -154,6 +154,8 @@ These decisions currently rely on agent instructions and judgment. They are not 
 
 An error screen can be valid evidence for an error-path check. Its meaning depends on the expected result.
 
+A recording contains the agent's idle time between actions, so its length does not match how much content it has. `scripts/demo_cut.py` makes a demo copy with the still parts cut, outside the managed directory. It is presentation material, not evidence.
+
 ### Publishing verification
 
 - [ ] Check image pairing and standalone video playback in a rendered fixture PR.

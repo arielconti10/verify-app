@@ -62,3 +62,36 @@ If the PNG is unclear too, inspect browser rendering before attributing the prob
 For a separate diagnostic, compare device scales 1 and 2 with identical CSS viewport, zoom, and page state.
 Keep diagnostic files outside managed evidence. Check actual dimensions, decoding, pointer targeting, and motion.
 Preserve original media. Do not change managed settings or silently lower resolution after failure.
+
+## Demo cut
+
+The recording is continuous on purpose. It proves the action→result sequence. But the agent
+thinks between tool calls, and that time is recorded too — one measured run had 43 s of video and
+about 4.5 s of content.
+
+For a demo, make a shorter copy:
+
+```sh
+python3 scripts/demo_cut.py "$VERIFY_DIR/interaction.mp4" -o "$DEMO_DIR/demo.mp4" --report
+```
+
+- Never change the original, and write the demo outside the capture folder. The script refuses to
+  write inside it.
+- The demo is not evidence. `check` only validates the original.
+- Every still part is cut to `--keep` seconds (default 0.6), keeping its start, so the result on
+  screen is still readable.
+- Still parts shorter than `--min-freeze` (default 1.0 s) stay. They are normal reading pauses.
+
+Check the cut against a fake video with known timings (15 s in, 7.8 s out):
+
+```sh
+ffmpeg -hide_banner -loglevel error -y \
+  -f lavfi -i "color=c=navy:s=640x360:d=2:r=60" \
+  -f lavfi -i "testsrc=s=640x360:d=3:r=60" \
+  -f lavfi -i "color=c=navy:s=640x360:d=4:r=60" \
+  -f lavfi -i "testsrc=s=640x360:d=3:r=60" \
+  -f lavfi -i "color=c=navy:s=640x360:d=3:r=60" \
+  -filter_complex "[0:v][1:v][2:v][3:v][4:v]concat=n=5:v=1:a=0[v]" -map "[v]" \
+  -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p /tmp/synth.mp4
+python3 scripts/demo_cut.py /tmp/synth.mp4 -o /tmp/synth-demo.mp4 --report
+```
