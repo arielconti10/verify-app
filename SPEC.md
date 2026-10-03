@@ -154,7 +154,7 @@ These decisions currently rely on agent instructions and judgment. They are not 
 
 An error screen can be valid evidence for an error-path check. Its meaning depends on the expected result.
 
-A recording contains the agent's idle time between actions, so its length does not match how much content it has. `scripts/demo_cut.py` makes a demo copy with the still parts cut, outside the managed directory. It is presentation material, not evidence.
+A recording contains the agent's idle time between actions, so its length does not match how much content it has. A watchable demo is recorded as separate gesture takes, with the recorder stopped between them, then joined by `scripts/demo_join.py` outside the managed directory. Do not cut still frames out of the evidence file. The demo is presentation material, not evidence.
 
 ### Publishing verification
 
