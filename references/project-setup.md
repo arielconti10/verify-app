@@ -49,9 +49,10 @@ Missing validation remains incomplete; setup cannot make it optional.
 
 ## Map features
 
-Map the requested feature and required primary paths in the procedure. Split substantial workflows into linked feature files.
+Map the requested feature and required primary paths. Follow the [feature map format](feature-map.md).
+If an existing map uses another layout, convert only the feature files you update. Leave the others unchanged.
 Each feature needs entry points, account/data state, actions, observable results, persistence checks, side effects, and cleanup.
-Include relevant alternate entry points. Keep shared startup and capture commands in one place.
+Give each sub-feature a stable ID. Include relevant alternate entry points. Keep shared startup and capture commands in the procedure.
 
 ## Test and maintain
 
@@ -60,4 +61,5 @@ Check startup, health, interaction, result, evidence validation, and cleanup. Co
 For managed media, require a fresh successful `check` before accepting files.
 Record the tested feature and remaining gaps. Never present an unexecuted procedure as verified.
 Follow the scope and cleanup rules in SKILL.md after failures.
-Update invalid steps and repeat affected checks. Schedule maintenance only when requested.
+Update invalid steps and repeat affected checks. Record traps found during a run in that feature's `Gotchas`.
+Schedule maintenance only when requested.
