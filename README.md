@@ -73,7 +73,8 @@ The optional [publishing guide](references/publish-evidence.md) covers `gh --att
 It explains upload access, Markdown URL replacement, video placement, and recovery after partial failures.
 
 The local formatter prepares Before/After tables, previews, and standalone videos from freshly validated captures.
-It replaces one marked evidence section while preserving unrelated PR text. It does not publish anything itself.
+It replaces one marked evidence section while preserving unrelated PR text.
+For an existing PR it reads the description itself, never prints it, and publishes only with `--publish`.
 PR evidence goes in the description; comments are not used as upload storage.
 
 ## Tests
