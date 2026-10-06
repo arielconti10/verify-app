@@ -15,7 +15,7 @@ A passing build, accepted screenshot, or completed upload proves only its own ch
 | Coding agent | Scope decisions, project discovery, real interactions, visual review, and truthful reporting. |
 | Browser or application tool | Navigation, authentication, input, screenshots, recordings, and observable runtime state. |
 | Capture helper | Managed capture settings, file integrity, media checks, and accepted-file output. |
-| Evidence formatter | Comparison markup, exact replacement of its marked section, and attachment selection. |
+| Evidence formatter | Comparison markup, exact replacement of its marked section, attachment selection, and PR publication that keeps the existing description out of the agent's view. |
 | GitHub CLI | Authorized uploads and replacement of local Markdown references with attachment URLs. |
 
 The instructions must work with different coding agents and codebases.
@@ -177,8 +177,9 @@ Static scores are diagnostic signals. Do not remove useful checks or tests merel
 
 ## Verification and completion
 
-The current local suite contains 34 tests: 22 capture-helper tests and 12 formatter tests.
-Coverage includes acceptance and rejection, capture completion, media decoding, locking, body preservation, and formatter error paths.
+The capture-helper and formatter suites contain 39 tests: 22 capture-helper tests and 17 formatter tests.
+Coverage includes acceptance and rejection, capture completion, media decoding, locking, body preservation, formatter error paths,
+and publication against a stand-in for gh that checks the existing description is never printed.
 Media tests need FFmpeg and ffprobe; skipped tests must remain visible in the result.
 
 A real capture set was used to check fresh validation, attachment selection, and repeated local formatting.

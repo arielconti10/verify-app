@@ -1,4 +1,8 @@
-"""Prepare a local PR body and attachment list from freshly checked managed evidence."""
+"""Prepare a PR body and attachment list from freshly checked managed evidence.
+
+With --pr and --repo, fetch the existing description, merge the evidence section, and with
+--publish update the PR. The existing description is never printed: it can contain text
+written by other people, so it stays inside this script."""
 
 import argparse
 from contextlib import ExitStack
@@ -106,15 +110,77 @@ def prepare(manifest, base, body):
         }
 
 
+def outside(body):
+    if START in body and END in body:
+        return body[: body.index(START)], body[body.index(END) + len(END) :]
+    return body, ""
+
+
+def section(body):
+    return body[body.index(START) : body.index(END) + len(END)]
+
+
+def gh(*args):
+    return evidence.subprocess.run(
+        ["gh", *args], capture_output=True, text=True, check=False, timeout=600
+    )
+
+
+def fetch(pr, repo):
+    result = gh("pr", "view", pr, "--repo", repo, "--json", "body,url")
+    evidence.require(result.returncode == 0, f"gh pr view failed: {result.stderr.strip()[:300]}")
+    data = json.loads(result.stdout)
+    return data["body"], data["url"]
+
+
+def publish(manifest, base, pr, repo, apply):
+    body, url = fetch(pr, repo)
+    plan = prepare(manifest, base, body)
+    summary = {"pr": url, "attachments": plan["attachments"], "section": section(plan["body"])}
+    if not apply:
+        return dict(summary, status="ready"), 0
+    with evidence.tempfile.NamedTemporaryFile("wb", suffix=".md", delete=False) as handle:
+        handle.write(plan["body"].encode("utf-8"))
+    try:
+        command = ["pr", "edit", pr, "--repo", repo, "--body-file", handle.name]
+        for path in plan["attachments"]:
+            command.extend(["--attach", path])
+        edit = gh(*command)
+    finally:
+        Path(handle.name).unlink()
+    published, _ = fetch(pr, repo)
+    unchanged = outside(published) == outside(plan["body"])
+    unresolved = [p for p in plan["attachments"] if p in published]
+    status = "published" if edit.returncode == 0 and unchanged and not unresolved else "incomplete"
+    summary.update(
+        status=status,
+        section=section(published) if START in published and END in published else None,
+        outside_unchanged=unchanged,
+        unresolved=unresolved,
+        gh_error=edit.stderr.strip()[:300] if edit.returncode else None,
+    )
+    return summary, 0 if status == "published" else 1
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
-    parser.add_argument("--body-file", type=Path)
+    parser.add_argument("--body-file", type=Path, help="Body you wrote for a new PR")
+    parser.add_argument("--pr", help="Existing PR number; requires --repo")
+    parser.add_argument("--repo", help="OWNER/REPO of the existing PR")
+    parser.add_argument("--publish", action="store_true", help="Update the existing PR")
     args = parser.parse_args()
     try:
+        manifest = json.loads(args.manifest.read_text())
+        base = args.manifest.resolve().parent
+        if args.pr or args.repo or args.publish:
+            evidence.require(args.pr and args.repo, "--pr and --repo are both required")
+            evidence.require(not args.body_file, "--body-file is only for new PRs")
+            summary, code = publish(manifest, base, args.pr, args.repo, args.publish)
+            print(json.dumps(summary, indent=2))
+            return code
         body = args.body_file.read_bytes().decode("utf-8") if args.body_file else ""
-        plan = prepare(json.loads(args.manifest.read_text()), args.manifest.resolve().parent, body)
-        print(json.dumps(plan, indent=2))
+        print(json.dumps(prepare(manifest, base, body), indent=2))
         return 0
     except (
         ValueError,
