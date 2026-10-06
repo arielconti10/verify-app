@@ -38,6 +38,9 @@ Unchecked items are proposed work, not release commitments.
 
 - [x] Discover the actual application root, runtime, startup commands, readiness checks, and current address.
 - [x] Reuse existing verification procedures and feature maps.
+- [x] Write feature maps in a fixed format with sub-feature IDs, entry points, driving steps, and gotchas.
+- [x] Exercise every mapped entry point of a changed sub-feature or report it as not run.
+- [x] Label artifacts with their sub-feature ID and entry point.
 - [x] Create a project procedure when missing, using repository conventions and available tools.
 - [x] Keep setup in the task report when the task is read-only.
 - [x] Check startup commands for installations, migrations, workers, and shared-resource writes.
@@ -56,6 +59,7 @@ Unknown steps remain explicitly unverified.
 
 Start the feature map with the requested behavior and required primary paths.
 Include relevant alternate entry points, account or data state, side effects, and persistence checks.
+Each sub-feature has a stable ID so reports can name what passed, failed, or was not run.
 A setup is verified only after the agent executes one representative path and validates its evidence.
 Other mapped features remain untested until exercised.
 
@@ -202,6 +206,7 @@ A blocked or failed task can be reported completely without being described as v
 
 - [Skill instructions](SKILL.md)
 - [Project setup](references/project-setup.md)
+- [Feature map format](references/feature-map.md)
 - [Browser evidence](references/browser-evidence.md)
 - [Video recording and review](references/natural-recording.md)
 - [Evidence formatting and GitHub publishing](references/publish-evidence.md)

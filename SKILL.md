@@ -53,7 +53,9 @@ Use existing authorized test accounts. Keep credentials and saved browser state 
 ## Exercise the behavior
 
 Select changed entry points and observable success conditions before acting.
-Use a maintained feature map if one exists. Cover applicable changed paths and report any gaps.
+Use a maintained feature map if one exists. Cover applicable changed sub-features and report any gaps by ID.
+When the map lists several entry points for a changed sub-feature, exercise each one or report it as not run.
+A result from one entry point does not verify another.
 Use stable labels, roles, test IDs, routes, or command prompts. Refresh browser references after page changes.
 Check for automatic saves and other side effects before acting on shared data.
 Perform the real action. Do not substitute internal state setters or database edits for the user path.
@@ -68,6 +70,7 @@ Do not repeat payments, messages, destructive actions, or other consequential ch
 
 Save evidence outside tracked source files, in a task-specific directory. Preserve it through cleanup.
 Record the checkout, address or command, preconditions, action, expected result, observed result, and artifact paths.
+Label each artifact with its sub-feature ID and entry point in the record or report.
 Capture the action and result. A final screenshot alone does not prove the preceding interaction.
 Use screenshots for visual details. Use video when motion or a sequence matters, or when the task requires it.
 Do not require browser video for a library, backend, or documentation change without a relevant visual claim.
@@ -93,7 +96,8 @@ File validation does not establish visual quality or application correctness. Fo
 
 For comparison layouts or authorized PR publication, read [publish evidence](references/publish-evidence.md).
 
-Report passed checks, failed checks, and checks not run separately. Give a reason for each material gap.
+Report passed checks, failed checks, and checks not run separately. Name feature map sub-feature IDs when they apply.
+Give a reason for each material gap. Add traps found during the run to the feature's `Gotchas`.
 Describe the user action and observed result. Link the relevant evidence.
 Do not infer deployment, merge status, or complete product correctness from a local check.
 Upload only when the task authorizes it. Follow the destination's attachment rules and preserve existing content.
